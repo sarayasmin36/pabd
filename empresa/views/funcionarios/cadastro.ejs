@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Cadastro de Funcionário</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container mt-5">
+    <h1>Cadastrar Funcionário</h1>
+    <form action="/funcionarios/salvar" method="POST">
+        <div class="mb-3">
+            <label>Nome:</label>
+            <input type="text" name="nome" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label>Salário:</label>
+            <input type="number" step="0.01" name="salario" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label>Data de Admissão:</label>
+            <input type="date" name="data_admissao" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label>Cargo:</label>
+            <select name="id_cargo" class="form-control" required>
+                <% cargos.forEach(c => { %>
+                    <option value="<%= c.id_cargo %>"><%= c.nome_cargo %></option>
+                <% }) %>
+            </select>
+        </div>
+        <div class="mb-3">
+            <label>Setor:</label>
+            <select name="id_setor" class="form-control" required>
+                <% setores.forEach(s => { %>
+                    <option value="<%= s.id_setor %>"><%= s.nome_setor %></option>
+                <% }) %>
+            </select>
+        </div>
+        <button class="btn btn-success">Salvar</button>
+        <a href="/funcionarios" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>
+</body>
+</html>
