@@ -8,7 +8,11 @@
 <body>
 <div class="container mt-5">
     <h1>Lista de Vendas</h1>
-    <a href="/vendas/cadastro" class="btn btn-primary mb-3">Cadastrar Venda</a>
+
+    <a href="/vendas/cadastro" class="btn btn-primary mb-3">
+        Cadastrar Venda
+    </a>
+
     <table class="table table-bordered">
         <thead>
             <tr>
@@ -16,20 +20,25 @@
                 <th>Data</th>
                 <th>Valor</th>
                 <th>Cliente</th>
+                <th>Funcionário</th>
             </tr>
         </thead>
         <tbody>
             <% vendas.forEach(v => { %>
-            <tr>
-                <td><%= v.id_venda %></td>
-                <td><%= v.data_venda.toISOString().split('T')[0] %></td>
-                <td>R$ <%= v.valor.toFixed(2) %></td>
-                <td><%= v.nome %></td>
-            </tr>
+                <tr>
+                    <td><%= v.id_venda %></td>
+                    <td><%= v.data_venda.toISOString().split('T')[0] %></td>
+                    <td>R$ <%= Number(v.valor).toFixed(2) %></td>
+                    <td><%= v.cliente %></td>
+                    <td><%= v.funcionario %></td>
+                </tr>
             <% }) %>
         </tbody>
     </table>
-    <a href="/" class="btn btn-primary mb-3">Voltar para início</a>
+
+    <a href="/" class="btn btn-primary mb-3">
+        Voltar para início
+    </a>
 </div>
 </body>
 </html>
