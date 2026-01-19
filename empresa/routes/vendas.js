@@ -10,17 +10,46 @@ router.get('/', (req, res) => {
             v.data_venda,
             v.valor,
             c.nome AS cliente,
-            f.nome AS funcionario
+            f.nome AS funcionario,
+            p.nome_produto,
+            pv.quantidade
         FROM tb_venda v
         JOIN tb_cliente c ON v.id_cliente = c.id_cliente
         JOIN tb_funcionario f ON v.id_funcionario = f.id_funcionario
+        JOIN produto_venda pv ON pv.id_venda = v.id_venda
+        JOIN produto p ON pv.id_produto = p.id_produto
+        ORDER BY v.id_venda DESC
     `;
 
-    conexao.query(sql, (err, vendas) => {
+    conexao.query(sql, (err, rows) => {
         if (err) throw err;
+
+        // Agrupar produtos por venda
+        const vendas = [];
+        const mapa = {};
+
+        rows.forEach(row => {
+            if (!mapa[row.id_venda]) {
+                mapa[row.id_venda] = {
+                    id_venda: row.id_venda,
+                    data_venda: row.data_venda,
+                    valor: row.valor,
+                    cliente: row.cliente,
+                    funcionario: row.funcionario,
+                    produtos: []
+                };
+                vendas.push(mapa[row.id_venda]);
+            }
+            mapa[row.id_venda].produtos.push({
+                nome: row.nome_produto,
+                quantidade: row.quantidade
+            });
+        });
+
         res.render('vendas/listar', { vendas });
     });
 });
+
 
 // Formulário de cadastro
 router.get('/cadastro', (req, res) => {
@@ -46,21 +75,44 @@ router.get('/cadastro', (req, res) => {
 
 // Salvar venda
 router.post('/salvar', (req, res) => {
-    const { data_venda, valor, id_cliente, id_funcionario } = req.body;
-
-    const sql = `
-        INSERT INTO tb_venda (data_venda, valor, id_cliente, id_funcionario)
-        VALUES (?, ?, ?, ?)
+    const { data_venda, id_cliente, id_funcionario, valor, produtos } = req.body;
+  
+    // 1️⃣ cria a venda
+    const sqlVenda = `
+      INSERT INTO tb_venda (data_venda, valor, id_cliente, id_funcionario)
+      VALUES (?, ?, ?, ?)
     `;
-
+  
     conexao.query(
-        sql,
-        [data_venda, valor, id_cliente, id_funcionario],
-        err => {
-            if (err) throw err;
-            res.redirect('/vendas');
-        }
+      sqlVenda,
+      [data_venda, valor, id_cliente, id_funcionario],
+      (err, result) => {
+        if (err) throw err;
+  
+        const id_venda = result.insertId;
+  
+        // 2️⃣ insere os produtos
+        const sqlProduto = `
+          INSERT INTO produto_venda (id_venda, id_produto, quantidade, preco_unitario)
+          VALUES ?
+        `;
+  
+        const valores = produtos.map(p => [
+          id_venda,
+          parseInt(p.id_produto),
+          parseInt(p.quantidade),
+          parseFloat(p.preco)
+        ]);
+  
+        conexao.query(sqlProduto, [valores], err => {
+          if (err) throw err;
+  
+          res.redirect('/vendas');
+        });
+      }
     );
-});
+  });
+  
+
 
 module.exports = router;

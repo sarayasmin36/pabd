@@ -13,28 +13,38 @@
         Cadastrar Venda
     </a>
 
-    <table class="table table-bordered">
+    <table border="1">
         <thead>
-            <tr>
-                <th>ID</th>
-                <th>Data</th>
-                <th>Valor</th>
-                <th>Cliente</th>
-                <th>Funcionário</th>
-            </tr>
+          <tr>
+            <th>ID</th>
+            <th>Data</th>
+            <th>Cliente</th>
+            <th>Funcionário</th>
+            <th>Produtos</th>
+            <th>Valor Total</th>
+          </tr>
         </thead>
         <tbody>
-            <% vendas.forEach(v => { %>
-                <tr>
-                    <td><%= v.id_venda %></td>
-                    <td><%= v.data_venda.toISOString().split('T')[0] %></td>
-                    <td>R$ <%= Number(v.valor).toFixed(2) %></td>
-                    <td><%= v.cliente %></td>
-                    <td><%= v.funcionario %></td>
-                </tr>
-            <% }) %>
+          <% vendas.forEach(v => { %>
+            <tr>
+              <td><%= v.id_venda %></td>
+              <td><%= v.data_venda.toISOString().split('T')[0] %></td>
+              <td><%= v.cliente %></td>
+              <td><%= v.funcionario %></td>
+              <td>
+                <ul>
+                  <% v.produtos.forEach(p => { %>
+                    <li><%= p.nome %> (Qtd: <%= p.quantidade %>)</li>
+                  <% }) %>
+                </ul>
+              </td>
+              <td>R$ <%= parseFloat(v.valor).toFixed(2) %></td>
+
+            </tr>
+          <% }) %>
         </tbody>
-    </table>
+      </table>
+      
 
     <a href="/" class="btn btn-primary mb-3">
         Voltar para início

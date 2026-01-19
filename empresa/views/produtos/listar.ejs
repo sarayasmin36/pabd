@@ -25,7 +25,7 @@
             <tr>
                 <td><%= p.id_produto %></td>
                 <td><%= p.nome_produto %></td>
-                <td>R$ <%= p.preco.toFixed(2) %></td>
+                <td>R$ <%= parseFloat(p.preco).toFixed(2) %></td>
                 <td><%= p.estoque %></td>
                 <td><%= p.nome_categoria %></td>
                 <td><%= p.nome_fornecedor %></td>
