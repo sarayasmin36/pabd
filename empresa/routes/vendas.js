@@ -76,42 +76,53 @@ router.get('/cadastro', (req, res) => {
 // Salvar venda
 router.post('/salvar', (req, res) => {
     const { data_venda, id_cliente, id_funcionario, valor, produtos } = req.body;
-  
+
     // 1️⃣ cria a venda
     const sqlVenda = `
-      INSERT INTO tb_venda (data_venda, valor, id_cliente, id_funcionario)
-      VALUES (?, ?, ?, ?)
+        INSERT INTO tb_venda (data_venda, valor, id_cliente, id_funcionario)
+        VALUES (?, ?, ?, ?)
     `;
-  
-    conexao.query(
-      sqlVenda,
-      [data_venda, valor, id_cliente, id_funcionario],
-      (err, result) => {
+
+    conexao.query(sqlVenda, [data_venda, valor, id_cliente, id_funcionario], (err, result) => {
         if (err) throw err;
-  
+
         const id_venda = result.insertId;
-  
-        // 2️⃣ insere os produtos
+
+        // 2️⃣ insere os produtos na tabela produto_venda
         const sqlProduto = `
-          INSERT INTO produto_venda (id_venda, id_produto, quantidade, preco_unitario)
-          VALUES ?
+            INSERT INTO produto_venda (id_venda, id_produto, quantidade, preco_unitario)
+            VALUES ?
         `;
-  
+
         const valores = produtos.map(p => [
-          id_venda,
-          parseInt(p.id_produto),
-          parseInt(p.quantidade),
-          parseFloat(p.preco)
+            id_venda,
+            parseInt(p.id_produto),
+            parseInt(p.quantidade),
+            parseFloat(p.preco)
         ]);
-  
+
         conexao.query(sqlProduto, [valores], err => {
-          if (err) throw err;
-  
-          res.redirect('/vendas');
+            if (err) throw err;
+
+            // 3️⃣ Atualiza estoque de cada produto
+            produtos.forEach(p => {
+                const sqlEstoque = `
+                    UPDATE produto
+                    SET estoque = estoque - ?
+                    WHERE id_produto = ?
+                `;
+                conexao.query(sqlEstoque, [parseInt(p.quantidade), parseInt(p.id_produto)], err => {
+                    if (err) throw err;
+                    // console.log(`Estoque atualizado para produto ${p.id_produto}`);
+                });
+            });
+
+            // 4️⃣ redireciona após tudo
+            res.redirect('/vendas');
         });
-      }
-    );
-  });
+    });
+});
+
   
 
 
