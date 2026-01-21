@@ -10,102 +10,120 @@
     <h1>Cadastrar Venda</h1>
 
     <form action="/vendas/salvar" method="POST">
-        <label>Cliente:</label>
-        <select name="id_cliente" required>
-          <% clientes.forEach(c => { %>
-            <option value="<%= c.id_cliente %>"><%= c.nome %></option>
-          <% }) %>
-        </select>
-      
-        <label>Funcionário:</label>
-        <select name="id_funcionario" required>
-          <% funcionarios.forEach(f => { %>
-            <option value="<%= f.id_funcionario %>"><%= f.nome %></option>
-          <% }) %>
-        </select>
-      
-        <label>Data da venda:</label>
-        <input type="date" name="data_venda" value="<%= new Date().toISOString().split('T')[0] %>" required>
-      
-        <hr>
-      
-        <div id="produtos-container">
-          <div class="produto-group">
-            <select name="produtos[0][id_produto]" class="select-produto" required>
-              <% produtos.forEach(p => { %>
-                <option value="<%= p.id_produto %>" data-preco="<%= p.preco %>"><%= p.nome_produto %></option>
-              <% }) %>
+
+        <div class="mb-3">
+            <label class="form-label">Cliente:</label>
+            <select name="id_cliente" class="form-select" required>
+                <% clientes.forEach(c => { %>
+                    <option value="<%= c.id_cliente %>"><%= c.nome %></option>
+                <% }) %>
             </select>
-      
-            <input type="number" name="produtos[0][quantidade]" class="quantidade" min="1" value="1" required>
-            <input type="hidden" name="produtos[0][preco]" class="preco">
-          </div>
         </div>
-      
-        <button type="button" id="adicionar-produto">Adicionar Produto</button>
-      
+
+        <div class="mb-3">
+            <label class="form-label">Funcionário:</label>
+            <select name="id_funcionario" class="form-select" required>
+                <% funcionarios.forEach(f => { %>
+                    <option value="<%= f.id_funcionario %>"><%= f.nome %></option>
+                <% }) %>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Data da venda:</label>
+            <input type="date" name="data_venda"
+                   value="<%= new Date().toISOString().split('T')[0] %>"
+                   class="form-control" required>
+        </div>
+
         <hr>
-      
-        <label>Valor total: R$ <span id="valor-total">0.00</span></label>
-        <input type="hidden" name="valor" id="input-valor-total">
-      
-        <button type="submit">Salvar Venda</button>
-      </form>
-      
-      <script>
-        // Inicializa o preço do primeiro produto
-        function atualizarPrecoTotal() {
-          const grupos = document.querySelectorAll('.produto-group');
-          let total = 0;
-      
-          grupos.forEach(g => {
-            const select = g.querySelector('.select-produto');
-            const quantidade = parseInt(g.querySelector('.quantidade').value) || 0;
-            const preco = parseFloat(select.options[select.selectedIndex].dataset.preco);
-      
-            g.querySelector('.preco').value = preco; // hidden input
-      
-            total += quantidade * preco;
-          });
-      
-          document.getElementById('valor-total').textContent = total.toFixed(2);
-          document.getElementById('input-valor-total').value = total.toFixed(2);
-        }
-      
-        document.querySelectorAll('.select-produto, .quantidade').forEach(el => {
-          el.addEventListener('change', atualizarPrecoTotal);
-          el.addEventListener('input', atualizarPrecoTotal);
-        });
-      
-        // Adicionar produto dinamicamente
-        let contador = 1;
-        document.getElementById('adicionar-produto').addEventListener('click', () => {
-          const container = document.getElementById('produtos-container');
-          const grupo = document.querySelector('.produto-group').cloneNode(true);
-      
-          // atualiza nomes e reseta valores
-          grupo.querySelector('.select-produto').name = `produtos[${contador}][id_produto]`;
-          grupo.querySelector('.quantidade').name = `produtos[${contador}][quantidade]`;
-          grupo.querySelector('.quantidade').value = 1;
-          grupo.querySelector('.preco').name = `produtos[${contador}][preco]`;
-      
-          container.appendChild(grupo);
-          contador++;
-      
-          // adiciona evento de atualização
-          grupo.querySelectorAll('.select-produto, .quantidade').forEach(el => {
-            el.addEventListener('change', atualizarPrecoTotal);
-            el.addEventListener('input', atualizarPrecoTotal);
-          });
-      
-          atualizarPrecoTotal();
-        });
-      
-        // inicializa total
-        atualizarPrecoTotal();
-      </script>
-      
+
+        <h5>Produtos</h5>
+
+        <div id="produtos-container">
+            <div class="row g-2 produto-group mb-2">
+                <div class="col-md-6">
+                    <select name="produtos[0][id_produto]" class="form-select select-produto" required>
+                        <% produtos.forEach(p => { %>
+                            <option value="<%= p.id_produto %>" data-preco="<%= p.preco %>">
+                                <%= p.nome_produto %>
+                            </option>
+                        <% }) %>
+                    </select>
+                </div>
+
+                <div class="col-md-3">
+                    <input type="number" name="produtos[0][quantidade]"
+                           class="form-control quantidade"
+                           min="1" value="1" required>
+                </div>
+
+                <input type="hidden" name="produtos[0][preco]" class="preco">
+            </div>
+        </div>
+
+        <button type="button" id="adicionar-produto" class="btn btn-outline-primary mb-3">
+            + Adicionar Produto
+        </button>
+
+        <hr>
+
+        <div class="mb-3">
+            <strong>Valor total: R$ <span id="valor-total">0.00</span></strong>
+            <input type="hidden" name="valor" id="input-valor-total">
+        </div>
+
+        <button type="submit" class="btn btn-success">Salvar</button>
+        <a href="/vendas" class="btn btn-secondary">Cancelar</a>
     </form>
 </div>
+
+<script>
+function atualizarPrecoTotal() {
+    const grupos = document.querySelectorAll('.produto-group');
+    let total = 0;
+
+    grupos.forEach(g => {
+        const select = g.querySelector('.select-produto');
+        const quantidade = parseInt(g.querySelector('.quantidade').value) || 0;
+        const preco = parseFloat(select.options[select.selectedIndex].dataset.preco);
+
+        g.querySelector('.preco').value = preco;
+        total += quantidade * preco;
+    });
+
+    document.getElementById('valor-total').textContent = total.toFixed(2);
+    document.getElementById('input-valor-total').value = total.toFixed(2);
+}
+
+document.querySelectorAll('.select-produto, .quantidade').forEach(el => {
+    el.addEventListener('change', atualizarPrecoTotal);
+    el.addEventListener('input', atualizarPrecoTotal);
+});
+
+let contador = 1;
+document.getElementById('adicionar-produto').addEventListener('click', () => {
+    const container = document.getElementById('produtos-container');
+    const grupo = document.querySelector('.produto-group').cloneNode(true);
+
+    grupo.querySelector('.select-produto').name = `produtos[${contador}][id_produto]`;
+    grupo.querySelector('.quantidade').name = `produtos[${contador}][quantidade]`;
+    grupo.querySelector('.quantidade').value = 1;
+    grupo.querySelector('.preco').name = `produtos[${contador}][preco]`;
+
+    container.appendChild(grupo);
+    contador++;
+
+    grupo.querySelectorAll('.select-produto, .quantidade').forEach(el => {
+        el.addEventListener('change', atualizarPrecoTotal);
+        el.addEventListener('input', atualizarPrecoTotal);
+    });
+
+    atualizarPrecoTotal();
+});
+
+atualizarPrecoTotal();
+</script>
+
 </body>
 </html>

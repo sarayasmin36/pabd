@@ -13,7 +13,6 @@ const app = express();
 app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// Rotas
 app.use('/', indexRoutes);
 app.use('/funcionarios', funcionariosRoutes);
 app.use('/produtos', produtosRoutes);

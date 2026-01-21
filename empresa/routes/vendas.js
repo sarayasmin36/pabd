@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const conexao = require('../db');
 
-// Listar vendas (cliente + funcionário)
 router.get('/', (req, res) => {
     const sql = `
         SELECT 
@@ -24,7 +23,6 @@ router.get('/', (req, res) => {
     conexao.query(sql, (err, rows) => {
         if (err) throw err;
 
-        // Agrupar produtos por venda
         const vendas = [];
         const mapa = {};
 
@@ -51,21 +49,30 @@ router.get('/', (req, res) => {
 });
 
 
-// Formulário de cadastro
 router.get('/cadastro', (req, res) => {
+
     conexao.query('SELECT * FROM tb_cliente', (err, clientes) => {
         if (err) throw err;
 
         conexao.query('SELECT * FROM produto', (err, produtos) => {
             if (err) throw err;
 
-            conexao.query('SELECT * FROM tb_funcionario', (err, funcionarios) => {
+            
+
+            conexao.query(`
+                SELECT f.*
+                FROM tb_funcionario f
+                JOIN tb_setor s ON f.id_setor = s.id_setor
+                WHERE s.nome_setor = 'Vendas'
+            `, (err, funcionarios) => {
                 if (err) throw err;
+
+                
 
                 res.render('vendas/cadastro', {
                     clientes,
                     produtos,
-                    funcionarios   // ← ISSO resolve o erro
+                    funcionarios
                 });
             });
         });
@@ -73,11 +80,11 @@ router.get('/cadastro', (req, res) => {
 });
 
 
+
 // Salvar venda
 router.post('/salvar', (req, res) => {
     const { data_venda, id_cliente, id_funcionario, valor, produtos } = req.body;
 
-    // 1️⃣ cria a venda
     const sqlVenda = `
         INSERT INTO tb_venda (data_venda, valor, id_cliente, id_funcionario)
         VALUES (?, ?, ?, ?)
@@ -88,7 +95,6 @@ router.post('/salvar', (req, res) => {
 
         const id_venda = result.insertId;
 
-        // 2️⃣ insere os produtos na tabela produto_venda
         const sqlProduto = `
             INSERT INTO produto_venda (id_venda, id_produto, quantidade, preco_unitario)
             VALUES ?
@@ -104,7 +110,6 @@ router.post('/salvar', (req, res) => {
         conexao.query(sqlProduto, [valores], err => {
             if (err) throw err;
 
-            // 3️⃣ Atualiza estoque de cada produto
             produtos.forEach(p => {
                 const sqlEstoque = `
                     UPDATE produto
@@ -113,11 +118,9 @@ router.post('/salvar', (req, res) => {
                 `;
                 conexao.query(sqlEstoque, [parseInt(p.quantidade), parseInt(p.id_produto)], err => {
                     if (err) throw err;
-                    // console.log(`Estoque atualizado para produto ${p.id_produto}`);
                 });
             });
 
-            // 4️⃣ redireciona após tudo
             res.redirect('/vendas');
         });
     });
