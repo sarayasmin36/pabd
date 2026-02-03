@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Editar Funcionário</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+
+<body>
+<div class="container mt-5">
+
+
+<h1>Editar Funcionário</h1>
+
+
+<form action="/funcionarios/editar/<%= funcionario.id_funcionario %>" method="POST">
+
+
+<div class="mb-3">
+<label>Nome</label>
+<input type="text"
+       name="nome"
+       class="form-control"
+       value="<%= funcionario.nome %>"
+       required>
+</div>
+
+
+<div class="mb-3">
+<label>Salário</label>
+<input type="number"
+       step="0.01"
+       name="salario"
+       class="form-control"
+       value="<%= funcionario.salario %>"
+       required>
+</div>
+
+
+<div class="mb-3">
+<label>Data Admissão</label>
+<input type="date"
+       name="data_admissao"
+       class="form-control"
+       value="<%= funcionario.data_admissao.toISOString().split('T')[0] %>"
+       required>
+</div>
+
+
+<div class="mb-3">
+<label>Cargo</label>
+<select name="id_cargo" class="form-control">
+<% cargos.forEach(c => { %>
+<option value="<%= c.id_cargo %>"
+<%= c.id_cargo == funcionario.id_cargo ? 'selected' : '' %>>
+<%= c.nome_cargo %>
+</option>
+<% }) %>
+</select>
+</div>
+
+
+<div class="mb-3">
+<label>Setor</label>
+<select name="id_setor" class="form-control">
+<% setores.forEach(s => { %>
+<option value="<%= s.id_setor %>"
+<%= s.id_setor == funcionario.id_setor ? 'selected' : '' %>>
+<%= s.nome_setor %>
+</option>
+<% }) %>
+</select>
+</div>
+
+
+<button class="btn btn-success">Salvar</button>
+<a href="/funcionarios" class="btn btn-secondary">Cancelar</a>
+
+
+</form>
+
+
+</div>
+</body>
+</html>
