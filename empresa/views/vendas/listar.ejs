@@ -22,6 +22,7 @@
                 <th>Funcionário</th>
                 <th>Produtos</th>
                 <th>Valor Total</th>
+                <th>Ações</th>
             </tr>
         </thead>
         <tbody>
@@ -39,6 +40,19 @@
                     </ul>
                 </td>
                 <td>R$ <%= parseFloat(v.valor).toFixed(2) %></td>
+                <td>
+                    <a href="/vendas/editar/<%= v.id_venda %>" class="btn btn-warning btn-sm">
+                       Editar
+                    </a>
+                 
+                    <form action="/vendas/excluir/<%= v.id_venda %>" method="POST" style="display:inline;">
+                       <button type="submit"
+                         onclick="return confirm('Deseja excluir esta venda?')"
+                         class="btn btn-danger btn-sm">
+                         Excluir
+                       </button>
+                    </form>
+                 </td>
             </tr>
             <% }) %>
         </tbody>

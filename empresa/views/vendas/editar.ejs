@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Editar Venda</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+<div class="container mt-5">
+
+<h1>Editar Venda</h1>
+
+<form action="/vendas/atualizar/<%= venda.id_venda %>" method="POST">
+
+<div class="mb-3">
+    <label>Cliente</label>
+    <select name="id_cliente" class="form-select">
+        <% clientes.forEach(c => { %>
+            <option value="<%= c.id_cliente %>"
+              <%= c.id_cliente == venda.id_cliente ? 'selected' : '' %>>
+              <%= c.nome %>
+            </option>
+        <% }) %>
+    </select>
+</div>
+
+<div class="mb-3">
+    <label>Funcionário</label>
+    <select name="id_funcionario" class="form-select">
+        <% funcionarios.forEach(f => { %>
+            <option value="<%= f.id_funcionario %>"
+              <%= f.id_funcionario == venda.id_funcionario ? 'selected' : '' %>>
+              <%= f.nome %>
+            </option>
+        <% }) %>
+    </select>
+</div>
+
+<div class="mb-3">
+    <label>Data</label>
+    <input type="date" name="data_venda"
+     value="<%= venda.data_venda.toISOString().split('T')[0] %>"
+     class="form-control">
+</div>
+
+<hr>
+
+<h5>Produtos</h5>
+
+<div id="produtos-container">
+
+<!-- MODELO BASE -->
+<div class="row g-2 produto-group mb-2 d-none" id="modelo-produto">
+
+    <div class="col-md-6">
+        <select class="form-select select-produto">
+            <% produtos.forEach(prod => { %>
+                <option value="<%= prod.id_produto %>"
+                        data-preco="<%= prod.preco %>">
+                    <%= prod.nome_produto %>
+                </option>
+            <% }) %>
+        </select>
+    </div>
+
+    <div class="col-md-3">
+        <input type="number"
+               class="form-control quantidade"
+               min="1"
+               value="1">
+    </div>
+
+    <input type="hidden" class="preco">
+
+    <div class="col-md-1">
+        <button type="button"
+                class="btn btn-danger remover-produto">
+            X
+        </button>
+    </div>
+
+</div>
+
+<!-- PRODUTOS DA VENDA -->
+<% venda.produtos.forEach((p, i) => { %>
+
+<div class="row g-2 produto-group mb-2">
+
+    <div class="col-md-6">
+        <select name="produtos[<%= i %>][id_produto]"
+                class="form-select select-produto">
+            <% produtos.forEach(prod => { %>
+                <option value="<%= prod.id_produto %>"
+                        data-preco="<%= prod.preco %>"
+                        <%= prod.id_produto == p.id_produto ? 'selected' : '' %>>
+                    <%= prod.nome_produto %>
+                </option>
+            <% }) %>
+        </select>
+    </div>
+
+    <div class="col-md-3">
+        <input type="number"
+               name="produtos[<%= i %>][quantidade]"
+               value="<%= p.quantidade %>"
+               class="form-control quantidade"
+               min="1">
+    </div>
+
+    <input type="hidden"
+           name="produtos[<%= i %>][preco]"
+           class="preco">
+
+    <div class="col-md-1">
+        <button type="button"
+                class="btn btn-danger remover-produto">
+            X
+        </button>
+    </div>
+
+</div>
+
+<% }) %>
+
+</div>
+
+
+<button type="button" id="adicionar-produto" class="btn btn-outline-primary mt-2">
++ Adicionar Produto
+</button>
+
+<hr>
+
+<strong>Total: R$ <span id="valor-total">0.00</span></strong>
+<input type="hidden" name="valor" id="input-valor-total">
+
+<br><br>
+
+<button class="btn btn-success">Salvar Alterações</button>
+<a href="/vendas" class="btn btn-secondary">Cancelar</a>
+
+</form>
+</div>
+
+<script>
+    function atualizarTotal() {
+        let total = 0;
+    
+        document.querySelectorAll('.produto-group').forEach(g => {
+            const select = g.querySelector('.select-produto');
+            const quantidade = parseInt(g.querySelector('.quantidade').value) || 0;
+    
+            if (!select) return;
+    
+            const preco = parseFloat(
+                select.options[select.selectedIndex].dataset.preco
+            );
+    
+            g.querySelector('.preco').value = preco;
+            total += quantidade * preco;
+        });
+    
+        document.getElementById('valor-total').textContent = total.toFixed(2);
+        document.getElementById('input-valor-total').value = total.toFixed(2);
+    }
+    
+    // ===== REMOVER PRODUTO =====
+    document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('remover-produto')) {
+            e.target.closest('.produto-group').remove();
+            atualizarTotal();
+        }
+    });
+    
+    // ===== ADICIONAR PRODUTO =====
+    let contador = <%= venda.produtos.length %>;
+    
+    document.getElementById('adicionar-produto')
+    .addEventListener('click', function () {
+    
+        const container = document.getElementById('produtos-container');
+    
+        const modeloBase = document.getElementById('modelo-produto');
+
+    
+        if (!modeloBase) {
+            alert('Não há produto base para copiar.');
+            return;
+        }
+    
+        const novo = modeloBase.cloneNode(true);
+        novo.classList.remove('d-none');
+novo.removeAttribute('id');
+
+    
+        novo.querySelector('.select-produto').name =
+            `produtos[${contador}][id_produto]`;
+    
+        novo.querySelector('.quantidade').name =
+            `produtos[${contador}][quantidade]`;
+    
+        novo.querySelector('.preco').name =
+            `produtos[${contador}][preco]`;
+    
+        novo.querySelector('.quantidade').value = 1;
+    
+        container.appendChild(novo);
+        contador++;
+    
+        atualizarTotal();
+    });
+    
+    // recalcular sempre
+    document.addEventListener('change', atualizarTotal);
+    document.addEventListener('input', atualizarTotal);
+    
+    atualizarTotal();
+    </script>
+
+</body>
+</html>
