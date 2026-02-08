@@ -34,6 +34,7 @@
         <% produtos.forEach(p => { %>
 
             <tr>
+
                 <td><%= p.id_produto %></td>
                 <td><%= p.nome_produto %></td>
                 <td>R$ <%= parseFloat(p.preco).toFixed(2) %></td>
@@ -41,25 +42,47 @@
                 <td><%= p.nome_categoria %></td>
                 <td><%= p.nome_fornecedor %></td>
 
-                <td>
+<td>
 
-                    <!-- BOTÃO EDITAR -->
-                    <a href="/produtos/editar/<%= p.id_produto %>"
-                       class="btn btn-warning btn-sm">
-                        Editar
-                    </a>
-                
-                    <% if (p.total_vendas > 0) { %>
-                        <button class="btn btn-secondary btn-sm" disabled>Excluir</button>
-                        <small class="text-danger d-block">Produto está em uma venda</small>
-                    <% } else { %>
-                        <form action="/produtos/excluir/<%= p.id_produto %>" method="POST" style="display:onclick">
-                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Deseja excluir?')">Excluir</button>
-                        </form>
-                    <% } %>
-                
-                </td>
-                
+    <a href="/produtos/editar/<%= p.id_produto %>"
+       class="btn btn-warning btn-sm">
+        Editar
+    </a>
+
+    <% if (p.total_vendas > 0) { %>
+
+<div class="d-inline-block position-relative">
+
+    <button
+        type="button"
+        class="btn btn-secondary btn-sm"
+        style="cursor: pointer;"
+        onclick="alert('Este produto está em uma venda e não pode ser excluído!')"
+        onmouseover="this.nextElementSibling.style.display='block'"
+        onmouseout="this.nextElementSibling.style.display='none'">
+        Apagar
+    </button>
+
+    <small
+        class="text-danger position-absolute bg-white border rounded px-2 py-1"
+        style="display:none; top:100%; left:0; white-space:nowrap;">
+        Produto está à venda
+    </small>
+
+</div>
+
+
+    <% } else { %>
+
+        <a href="/produtos/excluir/<%= p.id_produto %>"
+           class="btn btn-danger btn-sm"
+           onclick="return confirm('Deseja realmente excluir?')">
+            Apagar
+        </a>
+
+    <% } %>
+
+</td>
 
             </tr>
 
@@ -69,7 +92,13 @@
 
     </table>
 
+<<<<<<< HEAD
+    <a href="/" class="btn btn-primary mb-3">
+        Voltar para início
+    </a>
+=======
     <a href="/" class="btn btn-secondary">Voltar</a>
+>>>>>>> 99ae30a1e58ee538fef0091f1be27231a2330757
 
 </div>
 
