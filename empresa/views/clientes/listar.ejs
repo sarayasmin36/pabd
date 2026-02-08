@@ -40,6 +40,51 @@
                 <td><%= c.email %></td>
                 <td><%= c.endereco %></td>
 
+<<<<<<< HEAD
+<td>
+
+    <a href="/clientes/editar/<%= c.id_cliente %>" 
+       class="btn btn-warning btn-sm">
+        Editar
+    </a>
+
+    <% if (c.total_vendas > 0) { %>
+
+        <div class="d-inline-block position-relative">
+
+            <button
+                type="button"
+                class="btn btn-secondary btn-sm"
+                style="cursor: pointer;"
+                onclick="alert('Este cliente está em uma venda e não pode ser excluído!')"
+                onmouseover="this.nextElementSibling.style.display='block'"
+                onmouseout="this.nextElementSibling.style.display='none'">
+                Excluir
+            </button>
+
+            <small
+                class="text-danger position-absolute bg-white border rounded px-2 py-1"
+                style="display:none; top:100%; left:0; white-space:nowrap;">
+                Cliente possui vendas
+            </small>
+
+        </div>
+
+    <% } else { %>
+
+        <a href="/clientes/excluir/<%= c.id_cliente %>" 
+           class="btn btn-danger btn-sm"
+           onclick="return confirm('Deseja excluir este cliente?')">
+            Excluir
+        </a>
+
+    <% } %>
+
+</td>
+
+
+
+=======
                 <td>
 
                     <a href="/clientes/editar/<%= c.id_cliente %>" 
@@ -54,6 +99,7 @@
                     </a>
 
                 </td>
+>>>>>>> 99ae30a1e58ee538fef0091f1be27231a2330757
 
             </tr>
             <% }) %>
