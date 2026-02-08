@@ -126,7 +126,5 @@ router.post('/salvar', (req, res) => {
     });
 });
 
-  
-
 
 module.exports = router;
