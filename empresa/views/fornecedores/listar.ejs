@@ -17,17 +17,64 @@
                 <th>Telefone</th>
                 <th>Email</th>
                 <th>CNPJ</th>
+                <th>Ações</th>
             </tr>
         </thead>
         <tbody>
             <% fornecedores.forEach(f => { %>
-            <tr>
-                <td><%= f.id_fornecedor %></td>
-                <td><%= f.nome_fornecedor %></td>
-                <td><%= f.telefone %></td>
-                <td><%= f.email %></td>
-                <td><%= f.cnpj %></td>
-            </tr>
+<tr>
+    <td><%= f.id_fornecedor %></td>
+    <td><%= f.nome_fornecedor %></td>
+    <td><%= f.telefone %></td>
+    <td><%= f.email %></td>
+    <td><%= f.cnpj %></td>
+
+    <td>
+
+        <!-- EDITAR -->
+        <a href="/fornecedores/editar/<%= f.id_fornecedor %>"
+           class="btn btn-warning btn-sm">
+            Editar
+        </a>
+
+        <% if (f.total_produtos > 0) { %>
+
+            <!-- EXCLUIR BLOQUEADO -->
+            <div class="d-inline-block position-relative">
+
+                <button
+                    type="button"
+                    class="btn btn-secondary btn-sm"
+                    style="cursor:pointer;"
+                    onclick="alert('Este fornecedor possui produtos cadastrados e não pode ser excluído!')"
+                    onmouseover="this.nextElementSibling.style.display='block'"
+                    onmouseout="this.nextElementSibling.style.display='none'">
+                    Excluir
+                </button>
+
+                <small
+                    class="text-danger position-absolute bg-white border rounded px-2 py-1"
+                    style="display:none; top:100%; left:0; white-space:nowrap;">
+                    Fornecedor possui produtos
+                </small>
+
+            </div>
+
+        <% } else { %>
+
+            <!-- EXCLUIR NORMAL -->
+            <a href="/fornecedores/excluir/<%= f.id_fornecedor %>"
+               class="btn btn-danger btn-sm"
+               onclick="return confirm('Deseja excluir este fornecedor?')">
+                Excluir
+            </a>
+
+        <% } %>
+
+    </td>
+
+</tr>
+
             <% }) %>
         </tbody>
     </table>
