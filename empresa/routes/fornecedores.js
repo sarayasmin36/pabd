@@ -3,11 +3,23 @@ const router = express.Router();
 const conexao = require('../db');
 
 router.get('/', (req, res) => {
-    conexao.query('SELECT * FROM fornecedor', (err, fornecedores) => {
+
+    const sql = `
+        SELECT f.*,
+               COUNT(p.id_produto) AS total_produtos
+        FROM fornecedor f
+        LEFT JOIN produto p 
+            ON p.id_fornecedor = f.id_fornecedor
+        GROUP BY f.id_fornecedor
+    `;
+
+    conexao.query(sql, (err, fornecedores) => {
         if (err) throw err;
         res.render('fornecedores/listar', { fornecedores });
     });
+
 });
+
 
 router.get('/cadastro', (req, res) => {
     res.render('fornecedores/cadastro');
