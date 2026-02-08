@@ -7,10 +7,21 @@ const conexao = require('../db');
 // LISTAR
 // ============================
 router.get('/', (req, res) => {
-    conexao.query('SELECT * FROM tb_cliente', (err, clientes) => {
+
+    const sql = `
+        SELECT c.*,
+               COUNT(v.id_venda) AS total_vendas
+        FROM tb_cliente c
+        LEFT JOIN tb_venda v 
+            ON v.id_cliente = c.id_cliente
+        GROUP BY c.id_cliente
+    `;
+
+    conexao.query(sql, (err, clientes) => {
         if (err) throw err;
         res.render('clientes/listar', { clientes });
     });
+
 });
 
 
@@ -99,12 +110,14 @@ router.post('/editar/:id', (req, res) => {
 // EXCLUIR
 // ============================
 router.get('/excluir/:id', (req, res) => {
+
     const id = req.params.id;
 
     conexao.query(
         'SELECT COUNT(*) AS total FROM tb_venda WHERE id_cliente = ?',
         [id],
         (err, resultado) => {
+
             if (err) throw err;
 
             if (resultado[0].total > 0) {
@@ -121,6 +134,7 @@ router.get('/excluir/:id', (req, res) => {
             );
         }
     );
+
 });
 
 
