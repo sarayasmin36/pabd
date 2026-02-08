@@ -6,7 +6,6 @@ const conexao = require('../db');
 // ================= LISTAR =================
 router.get('/', (req, res) => {
 
-    // a variável SQL precisa estar declarada aqui
     const sql = `
         SELECT 
             p.id_produto,
@@ -69,7 +68,8 @@ router.post('/salvar', (req, res) => {
         VALUES (?, ?, ?, ?, ?)
     `;
 
-    conexao.query(sql,
+    conexao.query(
+        sql,
         [nome_produto, preco, estoque, id_categoria, id_fornecedor],
         err => {
             if (err) {
@@ -131,7 +131,8 @@ router.post('/atualizar/:id', (req, res) => {
         WHERE id_produto = ?
     `;
 
-    conexao.query(sql,
+    conexao.query(
+        sql,
         [nome_produto, preco, estoque, id_categoria, id_fornecedor, id],
         err => {
 
@@ -146,6 +147,7 @@ router.post('/atualizar/:id', (req, res) => {
 });
 
 
+// ================= EXCLUIR =================
 router.post('/excluir/:id', (req, res) => {
 
     const id = req.params.id;
@@ -164,5 +166,6 @@ router.post('/excluir/:id', (req, res) => {
         }
     );
 });
+
 
 module.exports = router;
