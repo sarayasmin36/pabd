@@ -18,6 +18,7 @@ router.get('/', (req, res) => {
         LEFT JOIN tb_venda v
             ON v.id_funcionario = f.id_funcionario
         GROUP BY f.id_funcionario
+        ORDER BY f.nome ASC
     `;
 
     conexao.query(sql, (err, funcionarios) => {

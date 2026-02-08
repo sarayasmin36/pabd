@@ -126,5 +126,55 @@ router.post('/salvar', (req, res) => {
     });
 });
 
+// Excluir venda e devolver estoque
+router.post('/excluir/:id', (req, res) => {
+    const id_venda = req.params.id;
+
+    // 1. Buscar produtos da venda
+    const sqlBuscar = `
+        SELECT id_produto, quantidade
+        FROM produto_venda
+        WHERE id_venda = ?
+    `;
+
+    conexao.query(sqlBuscar, [id_venda], (err, produtos) => {
+        if (err) throw err;
+
+        // 2. Devolver estoque
+        produtos.forEach(p => {
+            const sqlEstoque = `
+                UPDATE produto
+                SET estoque = estoque + ?
+                WHERE id_produto = ?
+            `;
+            conexao.query(sqlEstoque, [p.quantidade, p.id_produto], err => {
+                if (err) throw err;
+            });
+        });
+
+        // 3. Excluir produtos da venda
+        const sqlDeleteProdutos = `
+            DELETE FROM produto_venda
+            WHERE id_venda = ?
+        `;
+
+        conexao.query(sqlDeleteProdutos, [id_venda], err => {
+            if (err) throw err;
+
+            // 4. Excluir venda
+            const sqlDeleteVenda = `
+                DELETE FROM tb_venda
+                WHERE id_venda = ?
+            `;
+
+            conexao.query(sqlDeleteVenda, [id_venda], err => {
+                if (err) throw err;
+
+                res.redirect('/vendas');
+            });
+        });
+    });
+});
+
 
 module.exports = router;

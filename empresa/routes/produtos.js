@@ -26,6 +26,7 @@ router.get('/', (req, res) => {
             p.estoque,
             c.nome_categoria,
             f.nome_fornecedor
+            ORDER BY p.nome_produto ASC
     `;
 
     conexao.query(sql, (err, produtos) => {
